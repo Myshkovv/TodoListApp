@@ -7,7 +7,6 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
-import androidx.core.view.marginStart
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.todolistapp.databinding.ActivityMainBinding
 
@@ -69,6 +68,8 @@ class MainActivity : AppCompatActivity() {
             .setNegativeButton("Отмена", null)
             .show()
     }
+
+
 
     override fun onDestroy() {
         super.onDestroy()
