@@ -12,35 +12,38 @@ import com.example.todolistapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
-    private val binding
-        get() = _binding
-            ?: throw IllegalStateException("Binding for ActivityLearnWordBinding most not be null")
+    private val binding get() = _binding!!
+
     private lateinit var taskViewModel: TaskViewModel // 1. ViewModel
     private lateinit var adapter: TaskAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main)) { v, insets ->
+        _binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.main)
+
+        ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom)
             insets
         }
-        _binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(binding.root)
 
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
 
         adapter = TaskAdapter { task ->
-            taskViewModel.delete(task) // 4. Удаление через ViewModel
+            taskViewModel.delete(task)
         }
 
-        binding.recyclerViewTasks.adapter = adapter
-        binding.recyclerViewTasks.layoutManager = LinearLayoutManager(this)
+        binding.recyclerViewTasks.apply {
+            adapter = this@MainActivity.adapter
+            layoutManager = LinearLayoutManager(this@MainActivity)
+        }
 
         taskViewModel.allTasks.observe(this) { tasks ->
-            adapter.submitList(tasks) // 6. Автоматическое обновление
+            adapter.submitList(tasks)
         }
+
 
 
         setupButton()
