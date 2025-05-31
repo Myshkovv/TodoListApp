@@ -1,12 +1,17 @@
 package com.example.todolistapp
 
+import android.app.NotificationChannel
+import android.app.NotificationManager
+import android.content.Intent
+import android.content.pm.PackageManager
 import android.content.res.Resources
+import android.Manifest
+import android.os.Build
 import android.os.Bundle
 import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
@@ -28,6 +33,7 @@ class MainActivity : AppCompatActivity() {
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.main)
 
+        createNotificationChannel()
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -57,10 +63,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
+
         setupButton()
 
         setupSwipeToDelete()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) !=
+                PackageManager.PERMISSION_GRANTED
+            ) {
 
+                requestPermissions(
+                    arrayOf(Manifest.permission.POST_NOTIFICATIONS),
+                    102
+                )
+            }
+        }
+        if (checkNotificationPermission()) {
+            NotificationHelper.showInputNotification(this)
+        }
     }
 
 
@@ -152,4 +172,31 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
         _binding = null
     }
+
+    private fun createNotificationChannel() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            val channel = NotificationChannel(
+                "task_channel_id",
+                "Добавление задач",
+                NotificationManager.IMPORTANCE_DEFAULT
+            ).apply {
+                description = "Канал для быстрого добавления задач"
+            }
+
+            val manager = getSystemService(NotificationManager::class.java)
+            manager.createNotificationChannel(channel)
+        }
+    }
+
+    private fun checkNotificationPermission(): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) ==
+                    PackageManager.PERMISSION_GRANTED
+        } else {
+            true
+        }
+    }
+
+
 }
+
