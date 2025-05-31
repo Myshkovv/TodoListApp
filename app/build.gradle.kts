@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
 }
 
 android {
@@ -37,9 +38,27 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    kotlin {
+        sourceSets {
+            debug {
+                kotlin.srcDir("build/generated/ksp/debug/kotlin")
+            }
+            release {
+                kotlin.srcDir("build/generated/ksp/release/kotlin")
+            }
+        }
+    }
 }
 
+
+
 dependencies {
+    implementation(libs.androidx.room.runtime)
+    implementation(libs.androidx.room.ktx)
+    ksp(libs.androidx.room.compiler)
+
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.livedata.ktx)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)

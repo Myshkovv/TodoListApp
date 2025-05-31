@@ -1,24 +1,33 @@
 package com.example.todolistapp
 
+import android.annotation.SuppressLint
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.todolistapp.databinding.ItemTaskBinding
 
+
 class TaskAdapter(
-    private val tasks: MutableList<String>,
-    private val onDeleteClick: (Int) -> Unit
+    private val onDeleteClick: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+
+    private var tasks = listOf<Task>()
 
     inner class TaskViewHolder(private val binding: ItemTaskBinding) :
         RecyclerView.ViewHolder(binding.root) {
 
-        fun bind(task: String) {
-            binding.tvTaskText.text = task
+        fun bind(task: Task) {
+            binding.tvTaskText.text = task.text
             binding.btnDelete.setOnClickListener {
-                onDeleteClick(adapterPosition)
+                onDeleteClick(task)
             }
         }
+    }
+
+    @SuppressLint("NotifyDataSetChanged")
+    fun submitList(newTasks: List<Task>) {
+        tasks = newTasks
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TaskViewHolder {
