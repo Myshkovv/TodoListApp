@@ -3,32 +3,50 @@ package com.example.todolistapp
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.widget.Toast
+import android.content.SharedPreferences
 import androidx.core.app.RemoteInput
 
 class InputReceiver : BroadcastReceiver() {
 
-
     override fun onReceive(context: Context, intent: Intent) {
-        // Получаем введенный текст
-        val inputText = RemoteInput.getResultsFromIntent(intent)
-            ?.getCharSequence("key_input")
-            ?.toString()
+        // 1. Получаем введенный текст
+        val remoteInput = RemoteInput.getResultsFromIntent(intent)
+        val taskText = remoteInput?.getCharSequence("key_input")?.toString()
 
-        if (!inputText.isNullOrEmpty()) {
-            // Просто показываем Toast (для теста)
-            Toast.makeText(context, "Добавлено: $inputText", Toast.LENGTH_SHORT).show()
+        if (!taskText.isNullOrEmpty()) {
+            // 2. Сохраняем в SharedPreferences
+            val prefs = getSharedPrefs(context)
+            saveTask(prefs, taskText)
 
-            // Здесь можно сохранить в SharedPreferences или БД
-            val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
-            val existingTasks = prefs.getStringSet(KEY_TASKS, mutableSetOf())?.toMutableSet() ?: mutableSetOf()
-            existingTasks.add(inputText)
-            prefs.edit().putStringSet(KEY_TASKS, existingTasks).apply()
+            // 3. Можно показать уведомление о успешном добавлении
+            NotificationHelper.showSuccessNotification(context, "Задача добавлена!")
+        }
+    }
+
+    private fun getSharedPrefs(context: Context): SharedPreferences {
+        return context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+    }
+
+    private fun saveTask(prefs: SharedPreferences, text: String) {
+        // Получаем текущий список задач
+        val existingTasks = prefs.getStringSet("tasks", mutableSetOf())?.toMutableSet()
+            ?: mutableSetOf()
+
+        // Добавляем новую задачу
+        existingTasks.add(text)
+
+        // Сохраняем обновленный список
+        prefs.edit().apply {
+            putStringSet("tasks", existingTasks)
+            apply()
         }
     }
 
     companion object {
-        private const val KEY_TASKS = "saved_tasks"
-        private const val PREFS_NAME = "tasks_prefs"
+        // Для удобства получения задач из Activity
+        fun getTasks(context: Context): Set<String> {
+            return context.getSharedPreferences("AppPrefs", Context.MODE_PRIVATE)
+                .getStringSet("tasks", emptySet()) ?: emptySet()
+        }
     }
 }

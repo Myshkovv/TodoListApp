@@ -60,4 +60,15 @@ object NotificationHelper {
                 .createNotificationChannel(channel)
         }
     }
+    fun showSuccessNotification(context: Context, message: String) {
+        val notification = NotificationCompat.Builder(context, "tasks_channel")
+            .setSmallIcon(android.R.drawable.ic_dialog_info)
+            .setContentTitle("Успешно!")
+            .setContentText(message)
+            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+            .build()
+
+        context.getSystemService(NotificationManager::class.java)
+            .notify(2, notification)
+    }
 }

@@ -81,6 +81,11 @@ class MainActivity : AppCompatActivity() {
         if (checkNotificationPermission()) {
             NotificationHelper.showInputNotification(this)
         }
+
+        val savedTasks = InputReceiver.getTasks(this)
+        savedTasks.forEach { taskText ->
+            taskViewModel.insert(Task(text = taskText))
+        }
     }
 
 
