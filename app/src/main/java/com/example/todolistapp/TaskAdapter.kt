@@ -8,7 +8,8 @@ import com.example.todolistapp.databinding.ItemTaskBinding
 
 
 class TaskAdapter(
-    private val onDeleteClick: (Task) -> Unit
+    private val onDeleteClick: (Task) -> Unit,
+    private val onEditClick: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
 
     private var tasks = listOf<Task>()
@@ -18,6 +19,30 @@ class TaskAdapter(
 
         fun bind(task: Task) {
             binding.tvTaskText.text = task.text
+
+            itemView.setOnLongClickListener {
+                onEditClick(task)
+                true
+            }
+
+            itemView.setOnLongClickListener {
+                itemView.animate()
+                    .scaleX(0.95f)
+                    .scaleY(0.95f)
+                    .setDuration(100)
+                    .withEndAction {
+                        itemView.animate()
+                            .scaleX(1f)
+                            .scaleY(1f)
+                            .setDuration(100)
+                            .start()
+                    }
+                    .start()
+
+                onEditClick(task)
+                true
+            }
+
             binding.btnDelete.setOnClickListener {
                 onDeleteClick(task)
             }

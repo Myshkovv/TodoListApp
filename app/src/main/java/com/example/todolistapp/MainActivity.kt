@@ -1,7 +1,9 @@
 package com.example.todolistapp
 
+import android.content.res.Resources
 import android.os.Bundle
 import android.widget.EditText
+import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.ViewCompat
@@ -14,7 +16,7 @@ class MainActivity : AppCompatActivity() {
     private var _binding: ActivityMainBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var taskViewModel: TaskViewModel // 1. ViewModel
+    private lateinit var taskViewModel: TaskViewModel
     private lateinit var adapter: TaskAdapter
 
 
@@ -31,9 +33,10 @@ class MainActivity : AppCompatActivity() {
 
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
 
-        adapter = TaskAdapter { task ->
-            taskViewModel.delete(task)
-        }
+        adapter = TaskAdapter (
+            onDeleteClick = { task -> taskViewModel.delete(task) },
+            onEditClick = { task -> showEditTaskDialog(task) }
+        )
 
         binding.recyclerViewTasks.apply {
             adapter = this@MainActivity.adapter
@@ -41,12 +44,15 @@ class MainActivity : AppCompatActivity() {
         }
 
         taskViewModel.allTasks.observe(this) { tasks ->
-            adapter.submitList(tasks)
+            if (tasks.isNullOrEmpty()) {
+                adapter.submitList(emptyList()) // Явно передаем пустой список
+            } else {
+                adapter.submitList(tasks)
+            }
         }
 
-
-
         setupButton()
+
     }
 
 
@@ -56,17 +62,26 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+
+
     private fun showAddTaskDialog() {
         val editText = EditText(this).apply {
             hint = "Введите задачу..."
         }
+
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(12.dpToPx(), 0.dpToPx(), 12.dpToPx(), 0.dpToPx())
+            addView(editText)
+        }
+
         AlertDialog.Builder(this)
             .setTitle("Добавить задачу")
-            .setView(editText)
+            .setView(container)
             .setPositiveButton("Добавить") { _, _ ->
                 editText.text.toString().takeIf { it.isNotEmpty() }?.let { text ->
                     if (text.isNotBlank()) {
-                        // 8. Создание и сохранение задачи
+                        // Создание и сохранение задачи
                         val task = Task(text = text)
                         taskViewModel.insert(task)
                     }
@@ -76,7 +91,35 @@ class MainActivity : AppCompatActivity() {
             .show()
     }
 
+    private fun showEditTaskDialog(task: Task) {
+        val editText = EditText(this).apply {
+            setText(task.text)
+            hint = "Редактировать задачу"
+            setSelection(text.length) // Курсор в конец
+        }
 
+        val container = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            setPadding(12.dpToPx(), 0.dpToPx(), 12.dpToPx(), 0)
+            addView(editText)
+        }
+
+        AlertDialog.Builder(this)
+            .setTitle("Редактировать задачу")
+            .setView(container)
+            .setPositiveButton("Сохранить") { _, _ ->
+                val newText = editText.text.toString()
+                if (newText.isNotBlank()) {
+                    // Создаем обновленную задачу
+                    val updatedTask = task.copy(text = newText)
+                    taskViewModel.update(updatedTask)
+                }
+            }
+            .setNegativeButton("Отмена", null)
+            .show()
+    }
+
+    fun Int.dpToPx(): Int = (this * Resources.getSystem().displayMetrics.density).toInt()
 
 
     override fun onDestroy() {
