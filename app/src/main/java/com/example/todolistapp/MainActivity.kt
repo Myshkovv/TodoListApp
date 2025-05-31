@@ -38,7 +38,9 @@ class MainActivity : AppCompatActivity() {
         taskViewModel = ViewModelProvider(this)[TaskViewModel::class.java]
 
         adapter = TaskAdapter (
-            onDeleteClick = { task -> taskViewModel.delete(task) },
+            onCheckboxClick = { task, isChecked ->
+                taskViewModel.updateTaskCompletion(task, isChecked)
+            },
             onEditClick = { task -> showEditTaskDialog(task) }
         )
 

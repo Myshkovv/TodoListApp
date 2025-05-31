@@ -7,5 +7,6 @@ import androidx.room.PrimaryKey
 data class Task(
     @PrimaryKey(autoGenerate = true) val id: Int = 0,
     val text: String,
+    val isCompleted: Boolean = false,
     val createdAt: Long = System.currentTimeMillis()
 )

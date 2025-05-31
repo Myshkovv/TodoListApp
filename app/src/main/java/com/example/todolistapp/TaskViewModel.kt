@@ -28,4 +28,8 @@ class TaskViewModel(application: Application) : AndroidViewModel(application) {
     fun update(task: Task) = viewModelScope.launch {
         repository.update(task)
     }
+
+    fun updateTaskCompletion(task: Task, isCompleted: Boolean) = viewModelScope.launch {
+        repository.update(task.copy(isCompleted = isCompleted))
+    }
 }
