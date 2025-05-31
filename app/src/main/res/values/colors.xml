@@ -2,4 +2,10 @@
 <resources>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
+
+    <color name="status_bar">#FFE0E0E0</color>  <!-- Цвет панели -->
+    <color name="on_primary">#FF424242</color>    <!-- Цвет иконок -->
+    <color name="gray_light">#ECECEC</color>
+    <color name="gray_dark">#F5F5F5</color>
+    <color name="dialog_botton">#808080</color>
 </resources>
