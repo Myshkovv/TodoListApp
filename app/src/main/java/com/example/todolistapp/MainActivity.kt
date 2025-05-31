@@ -6,10 +6,13 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.todolistapp.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity() {
@@ -24,6 +27,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         _binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(binding.main)
+
 
         ViewCompat.setOnApplyWindowInsetsListener(binding.main) { v, insets ->
             val systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars())
@@ -53,6 +57,8 @@ class MainActivity : AppCompatActivity() {
 
         setupButton()
 
+        setupSwipeToDelete()
+
     }
 
 
@@ -62,7 +68,25 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun setupSwipeToDelete() {
+        val swipeHandler = object :ItemTouchHelper.SimpleCallback(
+            0, // Не используем drag&drop
+            ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT // Свайп в обе стороны
+        ) {
+            override fun onMove(
+                recyclerView: RecyclerView,
+                viewHolder: RecyclerView.ViewHolder,
+                target: RecyclerView.ViewHolder
+            ) = false // Не поддерживаем перемещение
 
+            override fun onSwiped(viewHolder: RecyclerView.ViewHolder, direction: Int) {
+                val position = viewHolder.adapterPosition
+                taskViewModel.delete(adapter.currentList[position])
+            }
+        }
+
+        ItemTouchHelper(swipeHandler).attachToRecyclerView(binding.recyclerViewTasks)
+    }
 
     private fun showAddTaskDialog() {
         val editText = EditText(this).apply {
@@ -75,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             addView(editText)
         }
 
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.MyAlertDialogTheme)
             .setTitle("Добавить задачу")
             .setView(container)
             .setPositiveButton("Добавить") { _, _ ->
@@ -104,7 +128,7 @@ class MainActivity : AppCompatActivity() {
             addView(editText)
         }
 
-        AlertDialog.Builder(this)
+        AlertDialog.Builder(this, R.style.MyAlertDialogTheme)
             .setTitle("Редактировать задачу")
             .setView(container)
             .setPositiveButton("Сохранить") { _, _ ->

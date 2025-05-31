@@ -1,9 +1,23 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
-    <style name="Base.Theme.TodoListApp" parent="Theme.Material3.DayNight.NoActionBar">
+    <style name="Base.Theme.TodoListApp" parent="Theme.Material3.Light.NoActionBar">
         <!-- Customize your light theme here. -->
         <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="android:statusBarColor">@color/gray_light</item>
+        <item name="colorPrimary">@color/gray_light</item>
+        <item name="colorPrimaryVariant">@color/gray_light</item>
+
+        <item name="colorOnPrimary">@color/gray_dark</item>
     </style>
 
     <style name="Theme.TodoListApp" parent="Base.Theme.TodoListApp" />
+
+    <style name="MyButtonStyle" parent="Widget.Material3.Button.TextButton">
+        <item name="android:textColor">@color/dialog_botton</item>
+    </style>
+
+    <style name="MyAlertDialogTheme" parent="ThemeOverlay.Material3.MaterialAlertDialog">
+        <item name="buttonBarPositiveButtonStyle">@style/MyButtonStyle</item>
+        <item name="buttonBarNegativeButtonStyle">@style/MyButtonStyle</item>
+    </style>
 </resources>

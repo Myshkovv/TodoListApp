@@ -11,6 +11,8 @@ class TaskAdapter(
     private val onDeleteClick: (Task) -> Unit,
     private val onEditClick: (Task) -> Unit
 ) : RecyclerView.Adapter<TaskAdapter.TaskViewHolder>() {
+    var currentList: List<Task> = emptyList()
+        private set
 
     private var tasks = listOf<Task>()
 
@@ -50,8 +52,8 @@ class TaskAdapter(
     }
 
     @SuppressLint("NotifyDataSetChanged")
-    fun submitList(newTasks: List<Task>) {
-        tasks = newTasks
+    fun submitList(newList: List<Task>) {
+        currentList = newList
         notifyDataSetChanged()
     }
 
@@ -65,8 +67,8 @@ class TaskAdapter(
     }
 
     override fun onBindViewHolder(holder: TaskViewHolder, position: Int) {
-        holder.bind(tasks[position])
+        holder.bind(currentList[position])
     }
 
-    override fun getItemCount() = tasks.size
+    override fun getItemCount() = currentList.size
 }
